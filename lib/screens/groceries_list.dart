@@ -37,7 +37,15 @@ class _GroceriesListState extends State<GroceriesList> {
             : ListView.builder(
               itemCount: _groceryItems.length,
               itemBuilder:
-                  (ctx, index) => Grocery(groceryItem: _groceryItems[index]),
+                  (ctx, index) => Dismissible(
+                    onDismissed: (direction) {
+                      setState(() {
+                        _groceryItems.remove(_groceryItems[index]);
+                      });
+                    },
+                    key: ValueKey(_groceryItems[index].id),
+                    child: Grocery(groceryItem: _groceryItems[index]),
+                  ),
             );
     return Scaffold(
       appBar: AppBar(

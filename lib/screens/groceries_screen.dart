@@ -8,11 +8,9 @@ class GroceriesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Your groceries')),
-      body: Column(
-        children:
-            groceryItems
-                .map((groceryItem) => Grocery(groceryItem: groceryItem))
-                .toList(),
+      body: ListView.builder(
+        itemCount: groceryItems.length,
+        itemBuilder: (ctx, index) => Grocery(groceryItem: groceryItems[index]),
       ),
     );
   }

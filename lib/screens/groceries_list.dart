@@ -73,6 +73,27 @@ class _GroceriesListState extends State<GroceriesList> {
     _loadItems();
   }
 
+  void _removeItem(GroceryItem item) async {
+    final index = _groceryItems.indexOf(item);
+    setState(() {
+      _groceryItems.remove(item);
+    });
+
+    final url = Uri.https(
+      'dummy-backend-27d29-default-rtdb.firebaseio.com',
+      'shopping-list/${item.id}.json',
+    );
+
+    final response = await http.delete(url);
+
+    if (response.statusCode == 200) {
+      // Optional: Show error message
+      setState(() {
+        _groceryItems.insert(index, item);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget content = Center(
@@ -91,9 +112,7 @@ class _GroceriesListState extends State<GroceriesList> {
         itemBuilder:
             (ctx, index) => Dismissible(
               onDismissed: (direction) {
-                setState(() {
-                  _groceryItems.remove(_groceryItems[index]);
-                });
+                _removeItem(_groceryItems[index]);
               },
               key: ValueKey(_groceryItems[index].id),
               child: Grocery(groceryItem: _groceryItems[index]),

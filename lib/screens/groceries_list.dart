@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shopping_list_app/data/categories.dart';
-import 'package:shopping_list_app/data/dummy_items.dart';
 import 'package:shopping_list_app/models/grocery_item.dart';
 import 'package:shopping_list_app/screens/new_item.dart';
 import 'package:shopping_list_app/widgets/grocery.dart';
@@ -17,6 +16,8 @@ class GroceriesList extends StatefulWidget {
 
 class _GroceriesListState extends State<GroceriesList> {
   List<GroceryItem> _groceryItems = [];
+  bool _isLoading = true;
+
   void _loadItems() async {
     final url = Uri.https(
       'dummy-backend-27d29-default-rtdb.firebaseio.com',
@@ -43,6 +44,7 @@ class _GroceriesListState extends State<GroceriesList> {
     }
     setState(() {
       _groceryItems = loadedItems;
+      _isLoading = false;
     });
   }
 
@@ -66,27 +68,27 @@ class _GroceriesListState extends State<GroceriesList> {
 
   @override
   Widget build(BuildContext context) {
-    final content =
-        _groceryItems.isEmpty
-            ? Center(
-              child: const Text(
-                'No items added',
-                style: TextStyle(fontSize: 24),
-              ),
-            )
-            : ListView.builder(
-              itemCount: _groceryItems.length,
-              itemBuilder:
-                  (ctx, index) => Dismissible(
-                    onDismissed: (direction) {
-                      setState(() {
-                        _groceryItems.remove(_groceryItems[index]);
-                      });
-                    },
-                    key: ValueKey(_groceryItems[index].id),
-                    child: Grocery(groceryItem: _groceryItems[index]),
-                  ),
-            );
+    Widget content = Center(
+      child: const Text('No items added', style: TextStyle(fontSize: 24)),
+    );
+    if (_isLoading) {
+      content = Center(child: const CircularProgressIndicator());
+    }
+    if (_groceryItems.isNotEmpty) {
+      content = ListView.builder(
+        itemCount: _groceryItems.length,
+        itemBuilder:
+            (ctx, index) => Dismissible(
+              onDismissed: (direction) {
+                setState(() {
+                  _groceryItems.remove(_groceryItems[index]);
+                });
+              },
+              key: ValueKey(_groceryItems[index].id),
+              child: Grocery(groceryItem: _groceryItems[index]),
+            ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Your groceries'),

@@ -24,6 +24,12 @@ class _GroceriesListState extends State<GroceriesList> {
       'shopping-list.json',
     );
     final response = await http.get(url);
+    if (response.body == 'null') {
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
     if (response.statusCode > 400) {
       setState(() {
         _error = 'Failed to fetch data, please try again later';
@@ -32,6 +38,7 @@ class _GroceriesListState extends State<GroceriesList> {
       });
     }
     final Map<String, dynamic> listData = json.decode(response.body);
+
     final List<GroceryItem> loadedItems = [];
     for (final item in listData.entries) {
       final category =
